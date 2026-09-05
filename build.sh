@@ -1,37 +1,35 @@
 #!/bin/bash
-# Script to build image for qemu.
-# Author: Siddhant Jajoo.
+
+TARGET="qemu"
+while getopts "m:" opt; do
+    case $opt in
+        m) TARGET=$OPTARG ;;
+        *) echo "Usage: $0 [-m qemu|rpi4]"; exit 1 ;;
+    esac
+done
+
+if [ "$TARGET" = "rpi4" ]; then
+    cp conf/local.conf.rpi4 conf/local.conf
+else
+    cp conf/local.conf.qemu conf/local.conf
+fi
 
 git submodule init
 git submodule sync
 git submodule update
 
-# local.conf won't exist until this step on first execution
 source poky/oe-init-build-env
 
-
-CONFLINE="MACHINE = \"qemuarm64\""
-
-cat conf/local.conf | grep "${CONFLINE}" > /dev/null
-local_conf_info=$?
-
-if [ $local_conf_info -ne 0 ];then
-	echo "Append ${CONFLINE} in the local.conf file"
-	echo ${CONFLINE} >> conf/local.conf
-	
-else
-	echo "${CONFLINE} already exists in the local.conf file"
+bitbake-layers show-layers | grep "meta-aesd" > /dev/null
+if [ $? -ne 0 ]; then
+    bitbake-layers add-layer ../meta-aesd
 fi
 
-
-bitbake-layers show-layers | grep "meta-aesd" > /dev/null
-layer_info=$?
-
-if [ $layer_info -ne 0 ];then
-	echo "Adding meta-aesd layer"
-	bitbake-layers add-layer ../meta-aesd
-else
-	echo "meta-aesd layer already exists"
+if [ "$TARGET" = "rpi4" ]; then
+    bitbake-layers show-layers | grep "meta-raspberrypi" > /dev/null
+    if [ $? -ne 0 ]; then
+        bitbake-layers add-layer ../meta-raspberrypi
+    fi
 fi
 
 set -e
