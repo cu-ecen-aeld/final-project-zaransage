@@ -8,27 +8,30 @@ while getopts "m:" opt; do
     esac
 done
 
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+
+git -C "${SCRIPT_DIR}" submodule init
+git -C "${SCRIPT_DIR}" submodule sync
+git -C "${SCRIPT_DIR}" submodule update
+
+export TEMPLATECONF="${SCRIPT_DIR}/poky/meta-poky/conf"
+source "${SCRIPT_DIR}/poky/oe-init-build-env" "${SCRIPT_DIR}/build"
+
 if [ "$TARGET" = "rpi4" ]; then
-    cp conf/local.conf.rpi4 conf/local.conf
+    cp "${SCRIPT_DIR}/conf/local.conf.rpi4" conf/local.conf
 else
-    cp conf/local.conf.qemu conf/local.conf
+    cp "${SCRIPT_DIR}/conf/local.conf.qemu" conf/local.conf
 fi
-
-git submodule init
-git submodule sync
-git submodule update
-
-source poky/oe-init-build-env
 
 bitbake-layers show-layers | grep "meta-aesd" > /dev/null
 if [ $? -ne 0 ]; then
-    bitbake-layers add-layer ../meta-aesd
+    bitbake-layers add-layer "${SCRIPT_DIR}/meta-aesd"
 fi
 
 if [ "$TARGET" = "rpi4" ]; then
     bitbake-layers show-layers | grep "meta-raspberrypi" > /dev/null
     if [ $? -ne 0 ]; then
-        bitbake-layers add-layer ../meta-raspberrypi
+        bitbake-layers add-layer "${SCRIPT_DIR}/meta-raspberrypi"
     fi
 fi
 

@@ -1,4 +1,3 @@
 MACHINE = "qemuarm64"
-TEMPLATECONF=../meta-poky/conf
-DL_DIR ?= "/yocto-cache/downloads"
-SSTATE_DIR ?= "/yocto-cache/sstate-cache"
+DL_DIR ?= "/home/dmarble/yocto-cache/downloads"
+SSTATE_DIR ?= "/home/dmarble/yocto-cache/sstate-cache"

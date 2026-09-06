@@ -1,7 +1,6 @@
 MACHINE = "raspberrypi4-64"
-TEMPLATECONF=../meta-poky/conf
-DL_DIR ?= "/yocto-cache/downloads"
-SSTATE_DIR ?= "/yocto-cache/sstate-cache"
+DL_DIR ?= "/home/dmarble/yocto-cache/downloads"
+SSTATE_DIR ?= "/home/dmarble/yocto-cache/sstate-cache"
 RPI_USE_U_BOOT = "1"
 ENABLE_UART = "1"
 IMAGE_FSTYPES = "rpi-sdimg"
